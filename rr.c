@@ -21,6 +21,7 @@ struct process
   TAILQ_ENTRY(process) pointers;
 
   /* Additional fields here */
+  
   /* End of "Additional fields here" */
 };
 
@@ -159,8 +160,21 @@ int main(int argc, char *argv[])
   u32 total_waiting_time = 0;
   u32 total_response_time = 0;
 
+  struct process *new_process;
+
   /* Your code here */
+  for( u32 i = 0; i < size; ++i ) {
+    new_process = &data[i];
+    TAILQ_INSERT_TAIL(&list, new_process, pointers);
+  }
+
+  struct process *current_process;
   
+  TAILQ_FOREACH(current_process, &list, pointers) {
+    printf("PID: %d, Arrival Time: %d, Burst Time: %d\n", current_process->pid, current_process->arrival_time, current_process->burst_time);
+
+    
+  }
   /* End of "Your code here" */
 
   printf("Average waiting time: %.2f\n", (float)total_waiting_time / (float)size);
