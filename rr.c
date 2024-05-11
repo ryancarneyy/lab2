@@ -169,12 +169,13 @@ int main(int argc, char *argv[])
   }
 
   struct process *current_process;
-  
-  TAILQ_FOREACH(current_process, &list, pointers) {
-    printf("PID: %d, Arrival Time: %d, Burst Time: %d\n", current_process->pid, current_process->arrival_time, current_process->burst_time);
 
-    
+  while(!TAILQ_EMPTY(&list)) {
+    current_process = TAILQ_FIRST(&list);
+    TAILQ_REMOVE(&list, current_process, pointers);
+    printf("Removed process: %d\n", current_process->pid);
   }
+
   /* End of "Your code here" */
 
   printf("Average waiting time: %.2f\n", (float)total_waiting_time / (float)size);
