@@ -160,25 +160,73 @@ int main(int argc, char *argv[])
 
   u32 total_waiting_time = 0;
   u32 total_response_time = 0;
-  // u32 queue_size = size;
 
-  struct process *new_process;
+  // struct process *new_process;
 
   /* Your code here */
 
 
-  for( u32 i = 0; i < size; ++i ) {
-    new_process = &data[i];
-  
-  }
-
-  struct process *current_process =
+  struct process *current_process;
   struct process *iterator;
-  struct process *removed_process;
-  u32 time_running = 0; 
+  // struct process *removed_process;
+  u32 completed_processes = 0;
+  u32 quantum_cycle = 0;
+  u32 clock_cycle = 0; 
 
-  while( completed_processes) {
+  // still need to update clock cycle, remove finished proc, and move proc to back of queue after turn
 
+  while( completed_processes < size ) {
+    // moves queue to next process
+    if(quantum_cycle == quantum_length) {
+      TAILQ_REMOVE(&list, current_process, pointers);
+      TAILQ_INSERT_TAIL(&list, current_process, pointers);
+      quantum_cycle = 0;
+    }
+
+    // adds any ready processes to tailq
+    for( u32 i = 0; i < size; ++i ) {
+      if(data[i].arrival_time == clock_cycle) {
+        // printf("CC%d: Inserted process %d\n", clock_cycle, data[i].pid);
+        TAILQ_INSERT_TAIL(&list, &data[i], pointers);
+      }
+    }
+
+    if( !TAILQ_EMPTY(&list) ) {
+      // Assign current process to first in tailq
+      current_process = TAILQ_FIRST(&list);
+      // printf("First Node: %d\n", current_process->pid);
+
+      // process has burst time left
+      if( current_process->burst_time > 0) {
+        // decrement process burst
+        // printf("Ran process %d\n", current_process->pid);
+        current_process->burst_time -= 1;
+        clock_cycle += 1;
+        quantum_cycle += 1;
+        if(!current_process->responded)
+          current_process->responded = true;
+        TAILQ_FOREACH( iterator, &list, pointers ) {
+          if(iterator->pid != current_process->pid) {
+            total_waiting_time += 1;
+            if( !iterator->responded )
+              total_response_time += 1;
+          }
+        }
+        // increment total waiting and response time
+      }
+      // process finished
+      else {
+        TAILQ_REMOVE(&list, current_process, pointers);
+        // printf("Completed process %d\n", current_process->pid);
+        completed_processes += 1;
+        quantum_cycle = 0;
+      }
+    }
+    else {
+      clock_cycle += 1;
+      quantum_cycle = 0;
+    }
+  }
 
 
   /* End of "Your code here" */
