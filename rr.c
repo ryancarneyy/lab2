@@ -21,7 +21,7 @@ struct process
   TAILQ_ENTRY(process) pointers;
 
   /* Additional fields here */
-  
+  bool responded;
   /* End of "Additional fields here" */
 };
 
@@ -144,6 +144,7 @@ void init_processes(const char *path,
 
 int main(int argc, char *argv[])
 {
+
   if (argc != 3)
   {
     return EINVAL;
@@ -159,78 +160,26 @@ int main(int argc, char *argv[])
 
   u32 total_waiting_time = 0;
   u32 total_response_time = 0;
+  // u32 queue_size = size;
 
   struct process *new_process;
 
   /* Your code here */
+
+
   for( u32 i = 0; i < size; ++i ) {
     new_process = &data[i];
-    TAILQ_INSERT_TAIL(&list, new_process, pointers);
+  
   }
 
-  struct process *current_process = TAILQ_FIRST(&list);
+  struct process *current_process =
+  struct process *iterator;
   struct process *removed_process;
   u32 time_running = 0; 
 
-  while(!TAILQ_EMPTY(&list)) {
+  while( completed_processes) {
 
-    if(current_process->arrival_time <= time_running) { // Process has arrived
 
-      // current process has <= time than quant
-      if( current_process->burst_time <= quantum_length ) {
-        
-        // add time to overall time ran
-        time_running += current_process->burst_time;
-        // make burst time 0
-        current_process->burst_time = 0;
-        // temp pointer to remove process
-        removed_process = current_process;
-        printf("Removed process: %d\n", current_process->pid);
-        // move pointer to next in tailq
-        if(TAILQ_NEXT(current_process, pointers) == NULL) {
-        current_process = TAILQ_FIRST(&list);
-        }
-        else {
-          current_process = TAILQ_NEXT(current_process, pointers);
-        }
-        // remove the finished process from the tailq
-        TAILQ_REMOVE(&list, removed_process, pointers);
-
-      }
-
-      // current process is longer than quant
-      else {
-
-        // take quant length off of process
-        current_process->burst_time -= quantum_length;
-        printf("Ran process: %d | Remaining Time: %d\n", current_process->pid, current_process->burst_time);
-        // increase time ran by quant
-        time_running += quantum_length;
-
-        // move to the next in queue
-        if(TAILQ_NEXT(current_process, pointers) == NULL) {
-          if( TAILQ_FIRST(&list) != NULL ) {
-            current_process = TAILQ_FIRST(&list);
-          }
-          else 
-            break;
-        }
-        else {
-          current_process = TAILQ_NEXT(current_process, pointers);
-        }
-      }
-    }
-    else { // Process hasn't arrived
-
-      // move to next in queue
-      if(TAILQ_NEXT(current_process, pointers) == NULL) {
-        current_process = TAILQ_FIRST(&list);
-      }
-      else {
-        current_process = TAILQ_NEXT(current_process, pointers);
-      }
-    }
-  }
 
   /* End of "Your code here" */
 
